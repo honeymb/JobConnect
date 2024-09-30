@@ -14,9 +14,11 @@ export const register = async (req, res) => {
                 success: false
             });
         };
-        const file = req.file;
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        let cloudResponse, file = req.file;
+        if (file) {
+            const fileUri = getDataUri(file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        }
 
         const user = await User.findOne({ email });
         if (user) {
@@ -34,7 +36,7 @@ export const register = async (req, res) => {
             password: hashedPassword,
             role,
             profile: {
-                profilePhoto: cloudResponse.secure_url,
+                profilePhoto: cloudResponse?.secure_url,
             }
         });
 
@@ -50,13 +52,13 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password, role } = req.body;
-
         if (!email || !password || !role) {
             return res.status(400).json({
                 message: "Something is missing",
                 success: false
             });
         };
+
         let user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
@@ -64,6 +66,7 @@ export const login = async (req, res) => {
                 success: false,
             })
         }
+
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({
@@ -71,6 +74,7 @@ export const login = async (req, res) => {
                 success: false,
             })
         };
+
         // check if the role is correct or not
         if (role !== user.role) {
             return res.status(400).json({
@@ -79,9 +83,7 @@ export const login = async (req, res) => {
             })
         };
 
-        const tokenData = {
-            userId: user._id
-        }
+        const tokenData = { userId: user._id }
         const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         user = {
@@ -118,12 +120,12 @@ export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
 
-        const file = req.file;
+        let file = req.file, cloudResponse;
         // Cloudinary code
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
-
+        if (file) {
+            const fileUri = getDataUri(file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        }
 
         let skillsArray;
         if (skills) {
@@ -172,3 +174,101 @@ export const updateProfile = async (req, res) => {
         console.log(error);
     }
 }
+
+export const resetPassword = async (req, res) => {
+    const errResponse = (error) => res.status(500).json({
+        message: "An error occurred",
+        success: false,
+        error: error.message,
+    });
+
+    try {
+        const { email } = req.body;
+
+        // Ensure email exists
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required",
+                success: false,
+            });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false,
+            });
+        }
+
+        const { fullname } = user;
+
+        // Create token
+        const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
+
+        // Success response
+        return res.status(201).json({
+            message: "Reset email sent successfully!",
+            token,
+            userName: fullname,
+            success: true,
+        });
+
+    } catch (error) {
+        // Catch any errors and return a failed response
+        return errResponse(error);
+    }
+};
+
+export const changePassword = async (req, res) => {
+    try {
+        const { password, token } = req.body;
+
+        // Check if both password and token are provided
+        if (!password || !token) {
+            return res.status(400).json({
+                message: "Password and token are required",
+                success: false,
+            });
+        }
+
+        // Verify the token and extract the user's email
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (error) {
+            return res.status(400).json({
+                message: "Invalid or expired token",
+                success: false,
+            });
+        }
+
+        // Find the user by email
+        const user = await User.findOne({ email: decoded.email });
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false,
+            });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Update the user's password
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.status(201).json({
+            message: "Password changed successfully",
+            success: true,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "An error occurred",
+            success: false,
+        });
+    }
+};
