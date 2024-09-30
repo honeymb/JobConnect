@@ -9,7 +9,7 @@ import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 import { toast } from "sonner";
-import { LOGO_IMG_PATH, USER_IMG_PATH } from "@/lib/utils";
+import { USER_IMG_PATH } from "@/lib/utils";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
@@ -35,13 +35,11 @@ const Navbar = () => {
   return (
     <div className="bg-white">
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
-        <Avatar className="cursor-pointer w-20 h-20">
-          <AvatarImage
-            src={LOGO_IMG_PATH}
-            alt="Job Connect Image"
-            title="Job Connect! You are the one"
-          />
-        </Avatar>
+        <div>
+          <h1 className="text-2xl font-bold">
+            Job <span className="text-[#F83002]">Connect</span>
+          </h1>
+        </div>
         <div className="flex items-center gap-4">
           <ul className="flex font-medium items-center gap-5">
             {user && user.role === "recruiter" ? (
@@ -60,7 +58,7 @@ const Navbar = () => {
           </ul>
           {!user ? (
             <div className="flex items-center gap-2">
-              <Link to="/">
+              <Link to="/login">
                 <Button variant="outline">Login</Button>
               </Link>
               <Link to="/signup">

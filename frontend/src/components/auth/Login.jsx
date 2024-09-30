@@ -9,71 +9,48 @@ import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 
-const INPUT_FIELDS = {
-  fullname: "",
-  email: "",
-  phoneNumber: "",
-  password: "",
-  confirmPassword: "",
-  role: "",
-  file: "",
-}
-
-const Signup = () => {
-  const [input, setInput] = useState(INPUT_FIELDS);
+const Login = () => {
+  const [input, setInput] = useState({
+    email: "",
+    password: "",
+    role: "",
+  });
   const { loading, user } = useSelector((store) => store.auth);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const changeEventHandler = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(setLoading(true));
+      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+        headers: { "Content-Type": "application/json", },
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
+        navigate("/");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
   useEffect(() => {
     if (user) {
       navigate("/");
     }
   }, []);
-
-  const changeEventHandler = (e) => {
-    setInput((prevInput) => ({ ...prevInput, [e.target.name]: e.target.value }));
-  };
-
-  const changeFileHandler = (e) => {
-    setInput((prevInput) => ({ ...prevInput, file: e.target.files?.[0] }));
-  };
-
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    if (input.file) {
-      formData.append("file", input.file);
-    }
-    const entries = Object.fromEntries(formData);
-
-    try {
-      dispatch(setLoading(true));
-      if (input.password !== input.confirmPassword) {
-        throw new Error('Password does not match. Please try again!');
-      }
-      const res = await axios.post(`${USER_API_END_POINT}/register`, entries, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
-      if (res.data.success) {
-        navigate("/login");
-        toast.success(res.data.message);
-      }
-    } catch (error) {
-      if (error?.response?.data?.message) {
-        toast.error(error?.response?.data?.message);
-      } else {
-        toast.error(error?.message);
-      }
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
   return (
     <div>
       <Navbar />
@@ -82,17 +59,7 @@ const Signup = () => {
           onSubmit={submitHandler}
           className="w-1/2 border border-gray-200 rounded-md p-4 my-10"
         >
-          <h1 className="font-bold text-xl mb-5">Sign Up</h1>
-          <div className="my-2">
-            <Label>Full Name</Label>
-            <Input
-              type="text"
-              value={input.fullname}
-              name="fullname"
-              onChange={changeEventHandler}
-              placeholder="FullName"
-            />
-          </div>
+          <h1 className="font-bold text-xl mb-5">Login</h1>
           <div className="my-2">
             <Label>Email</Label>
             <Input
@@ -103,16 +70,7 @@ const Signup = () => {
               placeholder="test@gmail.com"
             />
           </div>
-          <div className="my-2">
-            <Label>Phone Number</Label>
-            <Input
-              type="text"
-              value={input.phoneNumber}
-              name="phoneNumber"
-              onChange={changeEventHandler}
-              placeholder="8080808080"
-            />
-          </div>
+
           <div className="my-2">
             <Label>Password</Label>
             <Input
@@ -120,24 +78,14 @@ const Signup = () => {
               value={input.password}
               name="password"
               onChange={changeEventHandler}
-              placeholder="Enter Password"
-            />
-          </div>
-          <div className="my-2">
-            <Label>Retype Password</Label>
-            <Input
-              type="password"
-              value={input.confirmPassword}
-              name="confirmPassword"
-              onChange={changeEventHandler}
-              placeholder="Confirm Password"
+              placeholder="Password"
             />
           </div>
           <div className="flex items-center justify-between">
             <RadioGroup className="flex items-center gap-4 my-5">
               <div className="flex items-center space-x-2 w-auto">
                 <Input
-                  id="jobseeker"
+                  id="r1"
                   type="radio"
                   name="role"
                   value="jobseeker"
@@ -145,11 +93,11 @@ const Signup = () => {
                   onChange={changeEventHandler}
                   className="cursor-pointer w-[0.85rem]"
                 />
-                <Label htmlFor="jobseeker">Job Seeker</Label>
+                <Label htmlFor="r1">Job Seeker</Label>
               </div>
               <div className="flex items-center space-x-2 w-auto">
                 <Input
-                  id="recruiter"
+                  id="r2"
                   type="radio"
                   name="role"
                   value="recruiter"
@@ -157,18 +105,9 @@ const Signup = () => {
                   onChange={changeEventHandler}
                   className="cursor-pointer"
                 />
-                <Label htmlFor="recruiter">Recruiter</Label>
+                <Label htmlFor="r2">Recruiter</Label>
               </div>
             </RadioGroup>
-            <div className="flex items-center gap-2">
-              <Label>Profile</Label>
-              <Input
-                accept="image/*"
-                type="file"
-                onChange={changeFileHandler}
-                className="cursor-pointer"
-              />
-            </div>
           </div>
           {loading ? (
             <Button className="w-full my-4">
@@ -177,13 +116,19 @@ const Signup = () => {
             </Button>
           ) : (
             <Button type="submit" className="w-full my-4">
-              Signup
+              Login
             </Button>
           )}
+          <div className="text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-blue-600">
+              Signup
+            </Link>
+          </div>
           <span className="text-sm">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-600">
-              Login
+            Forgot Your Password?{" "}
+            <Link to="/reset-password" className="text-blue-600">
+              Reset Password
             </Link>
           </span>
         </form>
@@ -192,4 +137,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
