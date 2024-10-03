@@ -54,7 +54,7 @@ export const login = async (req, res) => {
         const { email, password, role } = req.body;
         if (!email || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "All fields must be completed. Please fill in the missing information.",
                 success: false
             });
         };
