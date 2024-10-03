@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
+import signupImage from "@/assets/signup.jpg"; // Image reference from: https://www.pexels.com
+import { Upload } from "lucide-react"; // Import the upload icon
 
 const INPUT_FIELDS = {
   fullname: "",
@@ -20,7 +22,7 @@ const INPUT_FIELDS = {
   confirmPassword: "",
   role: "",
   file: "",
-}
+};
 
 const Signup = () => {
   const [input, setInput] = useState(INPUT_FIELDS);
@@ -32,7 +34,7 @@ const Signup = () => {
     if (user) {
       navigate("/");
     }
-  }, []);
+  }, [user, navigate]);
 
   const changeEventHandler = (e) => {
     setInput((prevInput) => ({ ...prevInput, [e.target.name]: e.target.value }));
@@ -53,14 +55,14 @@ const Signup = () => {
     try {
       dispatch(setLoading(true));
       if (input.password !== input.confirmPassword) {
-        throw new Error('Password does not match. Please try again!');
+        throw new Error("Password does not match. Please try again!");
       }
       const res = await axios.post(`${USER_API_END_POINT}/register`, entries, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       if (res.data.success) {
-        navigate("/");
+        navigate("/login");
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -75,118 +77,136 @@ const Signup = () => {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="flex items-center justify-center max-w-7xl mx-auto">
-        <form
-          onSubmit={submitHandler}
-          className="w-1/2 border border-gray-200 rounded-md p-4 my-10"
-        >
-          <h1 className="font-bold text-xl mb-5">Sign Up</h1>
-          <div className="my-2">
-            <Label>Full Name</Label>
-            <Input
-              type="text"
-              value={input.fullname}
-              name="fullname"
-              onChange={changeEventHandler}
-              placeholder="FullName"
-            />
-          </div>
-          <div className="my-2">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={input.email}
-              name="email"
-              onChange={changeEventHandler}
-              placeholder="test@gmail.com"
-            />
-          </div>
-          <div className="my-2">
-            <Label>Phone Number</Label>
-            <Input
-              type="text"
-              value={input.phoneNumber}
-              name="phoneNumber"
-              onChange={changeEventHandler}
-              placeholder="8080808080"
-            />
-          </div>
-          <div className="my-2">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              value={input.password}
-              name="password"
-              onChange={changeEventHandler}
-              placeholder="Enter Password"
-            />
-          </div>
-          <div className="my-2">
-            <Label>Retype Password</Label>
-            <Input
-              type="password"
-              value={input.confirmPassword}
-              name="confirmPassword"
-              onChange={changeEventHandler}
-              placeholder="Confirm Password"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <RadioGroup className="flex items-center gap-4 my-5">
-              <div className="flex items-center space-x-2 w-auto">
-                <Input
-                  id="jobseeker"
-                  type="radio"
-                  name="role"
-                  value="jobseeker"
-                  checked={input.role === "jobseeker"}
-                  onChange={changeEventHandler}
-                  className="cursor-pointer w-[0.85rem]"
-                />
-                <Label htmlFor="jobseeker">Job Seeker</Label>
-              </div>
-              <div className="flex items-center space-x-2 w-auto">
-                <Input
-                  id="recruiter"
-                  type="radio"
-                  name="role"
-                  value="recruiter"
-                  checked={input.role === "recruiter"}
-                  onChange={changeEventHandler}
-                  className="cursor-pointer"
-                />
-                <Label htmlFor="recruiter">Recruiter</Label>
-              </div>
-            </RadioGroup>
-            <div className="flex items-center gap-2">
-              <Label>Profile</Label>
+    <div
+      className="relative min-h-screen flex flex-col"
+      style={{
+        backgroundImage: `url(${signupImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="flex flex-col flex-1">
+        <Navbar />
+        <div className="flex justify-center items-center flex-1">
+          <form
+            onSubmit={submitHandler}
+            className="relative w-full max-w-md my-10 p-8 text-white bg-[#005477] bg-opacity-95 shadow-lg rounded-lg z-10"
+          >
+            <h1 className="font-bold text-2xl mb-6 text-center">Sign Up</h1>
+            <div className="my-4">
+              <Label>Full Name</Label>
               <Input
-                accept="image/*"
-                type="file"
-                onChange={changeFileHandler}
-                className="cursor-pointer"
+                type="text"
+                value={input.fullname}
+                name="fullname"
+                onChange={changeEventHandler}
+                placeholder="Full Name"
+                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
               />
             </div>
-          </div>
-          {loading ? (
-            <Button className="w-full my-4">
-              {" "}
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
-            </Button>
-          ) : (
-            <Button type="submit" className="w-full my-4">
-              Signup
-            </Button>
-          )}
-          <span className="text-sm">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-600">
-              Login
-            </Link>
-          </span>
-        </form>
+            <div className="my-4">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={input.email}
+                name="email"
+                onChange={changeEventHandler}
+                placeholder="test@gmail.com"
+                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+              />
+            </div>
+            <div className="my-4">
+              <Label>Phone Number</Label>
+              <Input
+                type="text"
+                value={input.phoneNumber}
+                name="phoneNumber"
+                onChange={changeEventHandler}
+                placeholder="8080808080"
+                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+              />
+            </div>
+            <div className="my-4">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                value={input.password}
+                name="password"
+                onChange={changeEventHandler}
+                placeholder="Enter Password"
+                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+              />
+            </div>
+            <div className="my-4">
+              <Label>Retype Password</Label>
+              <Input
+                type="password"
+                value={input.confirmPassword}
+                name="confirmPassword"
+                onChange={changeEventHandler}
+                placeholder="Confirm Password"
+                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+              />
+            </div>
+            <div className="my-4">
+              <RadioGroup className="flex items-center gap-4">
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="jobseeker"
+                    type="radio"
+                    name="role"
+                    value="jobseeker"
+                    checked={input.role === "jobseeker"}
+                    onChange={changeEventHandler}
+                    className="cursor-pointer h-4 w-4"
+                  />
+                  <Label htmlFor="jobseeker" className="text-sm">Job Seeker</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="recruiter"
+                    type="radio"
+                    name="role"
+                    value="recruiter"
+                    checked={input.role === "recruiter"}
+                    onChange={changeEventHandler}
+                    className="cursor-pointer h-4 w-4"
+                  />
+                  <Label htmlFor="recruiter" className="text-sm">Recruiter</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="flex items-center gap-2 mt-4">
+              <Label className="flex items-center">
+                <Upload className="h-5 w-5 mr-2 cursor-pointer" />
+                <span>{input.file ? input.file.name : "Upload Profile Picture"}</span>
+                <Input
+                  accept="image/*"
+                  type="file"
+                  onChange={changeFileHandler}
+                  className="hidden"
+                  name="file"
+                />
+              </Label>
+            </div>
+            {loading ? (
+           <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
+           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+         </Button>
+         
+            ) : (
+              <Button type="submit" className="w-full my-4 bg-black hover:bg-black-800 transition duration-200">
+                Signup
+              </Button>
+            )}
+            <span className="text-sm text-center">
+              Already have an account?{" "}
+              <Link to="/login" className="text-[#44c8ff] font-semibold hover:underline">
+                Login
+              </Link>
+            </span>
+          </form>
+        </div>
       </div>
     </div>
   );
