@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -13,7 +13,7 @@ import { setLoading } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 import signupImage from "@/assets/signup.jpg"; // Image reference from: https://www.pexels.com
 import { Upload } from "lucide-react"; // Import the upload icon
-import ReactPasswordChecklist from "react-password-checklist";
+import usePasswordChecker from "@/hooks/usePasswordChecker";
 
 const INPUT_FIELDS = {
   fullname: "",
@@ -25,22 +25,13 @@ const INPUT_FIELDS = {
   file: "",
 };
 
-const PWD_RULES = ["minLength", "specialChar", "number", "capital", "match"];
 const CLASS_NAME = "text-black rounded-[4px] border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
-const debounce = (cb, time) => {
-  let timer;
-  return (...args) => {
-    if (timer) clearTimeout(timer);  // Clear any previously set timer
-    timer = setTimeout(() => {
-      cb(...args);  // Only call the callback after the delay
-    }, time);
-  };
-};
 
 const Signup = () => {
   const [input, setInput] = useState(INPUT_FIELDS);
   const { loading, user } = useSelector((store) => store.auth);
-  const [isFormValid, setIsFormValid] = useState(false);
+  const { debouncedToastFn, isFormValid } = usePasswordChecker();
+  const [formValidity, setIsFormValid] = useState(isFormValid);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -53,26 +44,8 @@ const Signup = () => {
       setIsFormValid(input.confirmPassword === input.password);
       debouncedToastFn(input.password, input.confirmPassword); // Trigger debounced function only when input changes
     }
-    return () => toast.dismiss();
+    return () => toast.dismiss()
   }, [input.password, input.confirmPassword]);
-
-  // Debounced toast function to show password checklist after delay
-  const debouncedToastFn = useCallback(debounce((pwd, confirmPwd) => {
-    toast(
-      <ReactPasswordChecklist
-        rules={PWD_RULES}
-        minLength={5}
-        value={pwd}
-        valueAgain={confirmPwd}
-        onChange={onPasswordCheckerChange}
-      />,
-      {
-        dismissible: true,
-        duration: Infinity,
-        onDismiss: () => toast.dismiss(),
-      }
-    )
-  }, 500), []);
 
   const changeEventHandler = (e) => {
     setInput((prevInput) => ({ ...prevInput, [e.target.name]: e.target.value }));
@@ -113,10 +86,6 @@ const Signup = () => {
       dispatch(setLoading(false));
     }
   };
-
-  const onPasswordCheckerChange = (value) => {
-    setIsFormValid(value);
-  }
 
   return (
     <div
@@ -238,7 +207,7 @@ const Signup = () => {
             ) : (
               <Button
                 type="submit"
-                disabled={isFormValid ? false : true}
+                disabled={formValidity ? false : true}
                 className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
               >
                 Signup
