@@ -1,21 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { toast as sonnerToast } from 'sonner';
 import { useParams, useNavigate } from "react-router-dom";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { Loader2 } from "lucide-react"; // loader icon for loading state
 import resetImage from "@/assets/resetpwd.jpeg"; // the background image for ResetPassword
+import usePasswordChecker from "@/hooks/usePasswordChecker";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { debouncedToastFn, isFormValid } = usePasswordChecker();
+  const [formValidity, setIsFormValid] = useState(isFormValid);
   const { token } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (password || confirmPassword) {
+      setIsFormValid(confirmPassword === password);
+      debouncedToastFn(password, confirmPassword); // Trigger debounced function only when input changes
+    }
+    return () => sonnerToast.dismiss()
+  }, [password, confirmPassword]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -93,6 +105,7 @@ const ChangePassword = () => {
             ) : (
               <Button
                 type="submit"
+                disabled={formValidity ? false : true}
                 className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
               >
                 Change Password

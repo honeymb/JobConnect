@@ -13,6 +13,7 @@ import { setLoading } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 import signupImage from "@/assets/signup.jpg"; // Image reference from: https://www.pexels.com
 import { Upload } from "lucide-react"; // Import the upload icon
+import usePasswordChecker from "@/hooks/usePasswordChecker";
 
 const INPUT_FIELDS = {
   fullname: "",
@@ -24,17 +25,27 @@ const INPUT_FIELDS = {
   file: "",
 };
 
+const CLASS_NAME = "text-black rounded-[4px] border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+
 const Signup = () => {
   const [input, setInput] = useState(INPUT_FIELDS);
   const { loading, user } = useSelector((store) => store.auth);
+  const { debouncedToastFn, isFormValid } = usePasswordChecker();
+  const [formValidity, setIsFormValid] = useState(isFormValid);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
+    if (user) { navigate("/"); }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (input.password || input.confirmPassword) {
+      setIsFormValid(input.confirmPassword === input.password);
+      debouncedToastFn(input.password, input.confirmPassword); // Trigger debounced function only when input changes
+    }
+    return () => toast.dismiss()
+  }, [input.password, input.confirmPassword]);
 
   const changeEventHandler = (e) => {
     setInput((prevInput) => ({ ...prevInput, [e.target.name]: e.target.value }));
@@ -101,7 +112,7 @@ const Signup = () => {
                 name="fullname"
                 onChange={changeEventHandler}
                 placeholder="Full Name"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -112,7 +123,7 @@ const Signup = () => {
                 name="email"
                 onChange={changeEventHandler}
                 placeholder="test@gmail.com"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -123,7 +134,7 @@ const Signup = () => {
                 name="phoneNumber"
                 onChange={changeEventHandler}
                 placeholder="8080808080"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -134,7 +145,7 @@ const Signup = () => {
                 name="password"
                 onChange={changeEventHandler}
                 placeholder="Enter Password"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -145,7 +156,7 @@ const Signup = () => {
                 name="confirmPassword"
                 onChange={changeEventHandler}
                 placeholder="Confirm Password"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -190,12 +201,15 @@ const Signup = () => {
               </Label>
             </div>
             {loading ? (
-           <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
-           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
-         </Button>
-         
+              <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+              </Button>
             ) : (
-              <Button type="submit" className="w-full my-4 bg-black hover:bg-black-800 transition duration-200">
+              <Button
+                type="submit"
+                disabled={formValidity ? false : true}
+                className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
+              >
                 Signup
               </Button>
             )}

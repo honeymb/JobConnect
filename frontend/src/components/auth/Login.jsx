@@ -28,9 +28,14 @@ const Login = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    let inputData = { ...input };
+    if (input.email === 'admin.jobconnect@yopmail.com') {
+      setInput((prevInputData) => ({ ...prevInputData, role: 'admin' }));
+      inputData = { ...inputData, role: 'admin' }
+    }
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+      const res = await axios.post(`${USER_API_END_POINT}/login`, inputData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
@@ -105,7 +110,7 @@ const Login = () => {
                     value="jobseeker"
                     checked={input.role === "jobseeker"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4" 
+                    className="cursor-pointer h-4 w-4"
                   />
                   <Label htmlFor="jobseeker">Job Seeker</Label>
                 </div>
@@ -117,7 +122,7 @@ const Login = () => {
                     value="recruiter"
                     checked={input.role === "recruiter"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4"  
+                    className="cursor-pointer h-4 w-4"
                   />
                   <Label htmlFor="recruiter">Recruiter</Label>
                 </div>
@@ -133,7 +138,7 @@ const Login = () => {
                 Login
               </Button>
             )}
-            
+
             {/* Aligning the account and password recovery links */}
             <div className="text-sm text-center">
               <div>
