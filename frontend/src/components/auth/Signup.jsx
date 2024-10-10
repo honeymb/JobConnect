@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -13,6 +13,7 @@ import { setLoading } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 import signupImage from "@/assets/signup.jpg"; // Image reference from: https://www.pexels.com
 import { Upload } from "lucide-react"; // Import the upload icon
+import ReactPasswordChecklist from "react-password-checklist";
 
 const INPUT_FIELDS = {
   fullname: "",
@@ -24,17 +25,54 @@ const INPUT_FIELDS = {
   file: "",
 };
 
+const PWD_RULES = ["minLength", "specialChar", "number", "capital", "match"];
+const CLASS_NAME = "text-black rounded-[4px] border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+const debounce = (cb, time) => {
+  let timer;
+  return (...args) => {
+    if (timer) clearTimeout(timer);  // Clear any previously set timer
+    timer = setTimeout(() => {
+      cb(...args);  // Only call the callback after the delay
+    }, time);
+  };
+};
+
 const Signup = () => {
   const [input, setInput] = useState(INPUT_FIELDS);
   const { loading, user } = useSelector((store) => store.auth);
+  const [isFormValid, setIsFormValid] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
+    if (user) { navigate("/"); }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (input.password || input.confirmPassword) {
+      setIsFormValid(input.confirmPassword === input.password);
+      debouncedToastFn(input.password, input.confirmPassword); // Trigger debounced function only when input changes
+    }
+    return () => toast.dismiss();
+  }, [input.password, input.confirmPassword]);
+
+  // Debounced toast function to show password checklist after delay
+  const debouncedToastFn = useCallback(debounce((pwd, confirmPwd) => {
+    toast(
+      <ReactPasswordChecklist
+        rules={PWD_RULES}
+        minLength={5}
+        value={pwd}
+        valueAgain={confirmPwd}
+        onChange={onPasswordCheckerChange}
+      />,
+      {
+        dismissible: true,
+        duration: Infinity,
+        onDismiss: () => toast.dismiss(),
+      }
+    )
+  }, 500), []);
 
   const changeEventHandler = (e) => {
     setInput((prevInput) => ({ ...prevInput, [e.target.name]: e.target.value }));
@@ -76,6 +114,10 @@ const Signup = () => {
     }
   };
 
+  const onPasswordCheckerChange = (value) => {
+    setIsFormValid(value);
+  }
+
   return (
     <div
       className="relative min-h-screen flex flex-col"
@@ -101,7 +143,7 @@ const Signup = () => {
                 name="fullname"
                 onChange={changeEventHandler}
                 placeholder="Full Name"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -112,7 +154,7 @@ const Signup = () => {
                 name="email"
                 onChange={changeEventHandler}
                 placeholder="test@gmail.com"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -123,7 +165,7 @@ const Signup = () => {
                 name="phoneNumber"
                 onChange={changeEventHandler}
                 placeholder="8080808080"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -134,7 +176,7 @@ const Signup = () => {
                 name="password"
                 onChange={changeEventHandler}
                 placeholder="Enter Password"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -145,7 +187,7 @@ const Signup = () => {
                 name="confirmPassword"
                 onChange={changeEventHandler}
                 placeholder="Confirm Password"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className={CLASS_NAME}
               />
             </div>
             <div className="my-4">
@@ -190,12 +232,15 @@ const Signup = () => {
               </Label>
             </div>
             {loading ? (
-           <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
-           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
-         </Button>
-         
+              <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+              </Button>
             ) : (
-              <Button type="submit" className="w-full my-4 bg-black hover:bg-black-800 transition duration-200">
+              <Button
+                type="submit"
+                disabled={isFormValid ? false : true}
+                className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
+              >
                 Signup
               </Button>
             )}

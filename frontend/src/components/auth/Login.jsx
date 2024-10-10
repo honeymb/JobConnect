@@ -105,7 +105,7 @@ const Login = () => {
                     value="jobseeker"
                     checked={input.role === "jobseeker"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4" 
+                    className="cursor-pointer h-4 w-4"
                   />
                   <Label htmlFor="jobseeker">Job Seeker</Label>
                 </div>
@@ -117,7 +117,7 @@ const Login = () => {
                     value="recruiter"
                     checked={input.role === "recruiter"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4"  
+                    className="cursor-pointer h-4 w-4"
                   />
                   <Label htmlFor="recruiter">Recruiter</Label>
                 </div>
@@ -133,7 +133,7 @@ const Login = () => {
                 Login
               </Button>
             )}
-            
+
             {/* Aligning the account and password recovery links */}
             <div className="text-sm text-center">
               <div>
