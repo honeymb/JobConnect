@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+const SECRET_KEY = "WQEQWRERTR"
 
 export const register = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ export const register = async (req, res) => {
 
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "All fields must be completed. Please fill in the missing information.",
                 success: false
             });
         };
@@ -54,7 +55,7 @@ export const login = async (req, res) => {
         const { email, password, role } = req.body;
         if (!email || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "All fields must be completed. Please fill in the missing information.",
                 success: false
             });
         };
@@ -66,7 +67,7 @@ export const login = async (req, res) => {
                 success: false,
             })
         }
-
+        
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({
@@ -84,7 +85,8 @@ export const login = async (req, res) => {
         };
 
         const tokenData = { userId: user._id }
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
+        console.log("Token Data ---> ", tokenData);
+        const token = await jwt.sign(tokenData, SECRET_KEY, { expiresIn: '30d' });
 
         user = {
             _id: user._id,
@@ -205,7 +207,7 @@ export const resetPassword = async (req, res) => {
         const { fullname } = user;
 
         // Create token
-        const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: "1h" });
 
         // Success response
         return res.status(201).json({
@@ -236,7 +238,7 @@ export const changePassword = async (req, res) => {
         // Verify the token and extract the user's email
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.SECRET_KEY);
+            decoded = jwt.verify(token, SECRET_KEY);
         } catch (error) {
             return res.status(400).json({
                 message: "Invalid or expired token",
@@ -272,3 +274,83 @@ export const changePassword = async (req, res) => {
         });
     }
 };
+
+
+export const listUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        return res.status(200).json({
+            message: "Users fetched successfully.",
+            users,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while fetching users.",
+            success: false
+        });
+    }
+};
+
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        return res.status(200).json({
+            message: "User fetched successfully.",
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while fetching the user.",
+            success: false
+        });
+    }
+};
+
+
+export const editUserById = async (req, res) => {
+    try {
+        const { fullname, email, phoneNumber, role } = req.body;
+        const { id } = req.params;
+
+        let user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        // Update fields
+        if (fullname) user.fullname = fullname;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (role) user.role = role;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "User updated successfully.",
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while updating the user.",
+            success: false
+        });
+    }
+};
+
