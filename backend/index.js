@@ -9,6 +9,7 @@ import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
 dotenv.config({});
+// require('dotenv').config();
 
 const app = express();
 const API = (api) => `/api/v1/${api}`;
