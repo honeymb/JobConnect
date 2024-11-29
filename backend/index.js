@@ -9,6 +9,7 @@ import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
 dotenv.config({});
+// require('dotenv').config();
 
 const app = express();
 const API = (api) => `/api/v1/${api}`;
@@ -24,7 +25,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // API's
 app.use(API('user'), userRoute);
