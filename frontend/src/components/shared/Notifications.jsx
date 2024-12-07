@@ -8,17 +8,28 @@ import { getAllJobsPostedToday, getUserById, updateCompaniesViewedByUser, update
 import { setUser } from '@/redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 import useGetUserLocation from '@/hooks/useGetUserLocation';
+import { Dot } from 'lucide-react';
 
-const Notifications = ({ companyList = [] }) => {
+const Notifications = () => {
 
     const { user } = useSelector((store) => store.auth);
     const { ROUTE_PATH } = useGetUserLocation();
-    const [notificationList, setNotificationList] = useState(companyList);
+    const [notificationList, setNotificationList] = useState([]);
+    const [hasNotifications, setHasNotifications] = useState(true);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const openNotifs = async () => {
+        let notifDataList = [];
+        const isNotifLoaded = () => {
+            setHasNotifications(false);
+            if (notifDataList.length) {
+                setHasNotifications(true);
+            }
+            setNotificationList(notifDataList);
+            setLoading(false);
+        }
         try {
             if (user?.role === 'admin') {
                 setLoading(true);
@@ -26,7 +37,7 @@ const Notifications = ({ companyList = [] }) => {
                 dispatch(setUser(userData));
                 const companyList = await fetchCompanies();
                 const { companiesViewed = [] } = userData;
-                setNotificationList(companyList.filter((notification) => {
+                notifDataList = companyList.filter((notification) => {
                     const pendingStatus = (notification?.userData?.approvalStatus === 'pending');
                     if (companiesViewed && companiesViewed.length) {
                         const companyIndex = companiesViewed.findIndex(
@@ -39,14 +50,14 @@ const Notifications = ({ companyList = [] }) => {
                         return true;
                     }
                     return false;
-                }));
-                setLoading(false);
+                })
+                isNotifLoaded();
             } else if (user?.role === 'jobseeker') {
                 setLoading(true);
                 const userData = await getUserById(user._id);
                 const jobData = await getAllJobsPostedToday();
                 const { jobsViewed = [] } = userData;
-                setNotificationList(jobData.filter((notification) => {
+                notifDataList = jobData.filter((notification) => {
                     if (jobsViewed && jobsViewed.length) {
                         const companyIndex = jobsViewed.findIndex((jobId) => notification?._id === jobId)
                         if (companyIndex < 0) { return true; }
@@ -54,8 +65,8 @@ const Notifications = ({ companyList = [] }) => {
                         return true;
                     }
                     return false;
-                }));
-                setLoading(false);
+                });
+                isNotifLoaded();
             }
         } catch (error) {
             setLoading(false);
@@ -76,11 +87,15 @@ const Notifications = ({ companyList = [] }) => {
         }
     }
 
-    const getNotificationName = (name = '') => {
+    const getNotificationName = (notification = null) => {
+        let name = '';
+        if (notification) {
+            name = notification.name || notification.title;
+        }
         if (user?.role === 'admin') {
             return `${name} - pending approval`;
         } else if (user?.role === 'jobseeker') {
-            return `${name}`;
+            return <>{name}{notification?.company?.name ? <span className='text-blue-500'>{` - ${notification?.company?.name}`}</span> : ''}</>;
         }
         return name;
     }
@@ -91,8 +106,11 @@ const Notifications = ({ companyList = [] }) => {
 
     return (
         <Popover>
-            <PopoverTrigger asChild className="hover:cursor-pointer">
-                <BellIcon onClick={openNotifs} height={20} width={20} />
+            <PopoverTrigger asChild className="hover:cursor-pointer" onClick={openNotifs}>
+                <div className='relative'>
+                    {hasNotifications && <Dot className='top-[-18px] right-[-13px] absolute w-8 h-8 text-blue-600' />}
+                    <BellIcon height={20} width={20} />
+                </div>
             </PopoverTrigger>
             <PopoverContent className="relative top-3 right-16 w-80">
                 {loading && <div>Loading...</div>}
@@ -104,10 +122,10 @@ const Notifications = ({ companyList = [] }) => {
                         {notificationList.map(notification => (
                             <div
                                 key={notification._id}
-                                className='font-light text-[rgb(194_65_12)] italic cursor-pointer 65'
+                                className='font-medium text-[rgb(194_65_12)] italic cursor-pointer 65'
                                 onClick={() => viewNotification(notification)}
                             >
-                                {getNotificationName(notification.name || notification.title)}
+                                {getNotificationName(notification)}
                             </div>
                         ))}
                     </div>

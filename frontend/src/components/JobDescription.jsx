@@ -49,7 +49,6 @@ const JobDescription = () => {
     }
 
     useEffect(() => {
-        console.log('>> singleJob ', singleJob);
         const fetchSingleJob = async () => {
             try {
                 const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, { withCredentials: true });
@@ -65,7 +64,7 @@ const JobDescription = () => {
             }
         }
         fetchSingleJob();
-    }, [jobId, user]);
+    }, [jobId]);
 
     return (
         <div className='mx-auto my-10 max-w-7xl'>

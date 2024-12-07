@@ -8,12 +8,15 @@ import { APPLICATION_API_END_POINT } from '@/utils/constant';
 import axios from 'axios';
 
 const shortlistingStatus = ["Accepted", "Rejected"];
+const statusLabel = {
+    "Accepted": "Accept",
+    "Rejected": "Reject",
+}
 
 const ApplicantsTable = () => {
     const { applicants } = useSelector(store => store.application);
 
     const statusHandler = async (status, id) => {
-        console.log('called');
         try {
             axios.defaults.withCredentials = true;
             const res = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`, { status });
@@ -58,12 +61,16 @@ const ApplicantsTable = () => {
                                         <PopoverTrigger>
                                             <MoreHorizontal />
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-32">
+                                        <PopoverContent className="relative right-10 w-28">
                                             {
                                                 shortlistingStatus.map((status, index) => {
                                                     return (
-                                                        <div onClick={() => statusHandler(status, item?._id)} key={index} className='flex w-fit items-center my-2 cursor-pointer'>
-                                                            <span>{status}</span>
+                                                        <div
+                                                            onClick={() => statusHandler(status, item?._id)}
+                                                            key={index}
+                                                            className='flex items-center gap-2 w-fit hover:font-bold hover:text-blue-600 cursor-pointer'
+                                                        >
+                                                            <span>{statusLabel[status]}</span>
                                                         </div>
                                                     )
                                                 })

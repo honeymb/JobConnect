@@ -71,7 +71,7 @@ const Companies = () => {
                         <div className='flex items-center gap-2 cursor-pointer'>
                             <Input
                                 className="w-fit"
-                                placeHolder="Filter by name"
+                                placeholder="Filter by name"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                             />
