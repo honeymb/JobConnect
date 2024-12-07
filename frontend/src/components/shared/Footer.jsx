@@ -2,23 +2,23 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="border-t border-gray-200 py-10 bg-gray-900 text-gray-200">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+    <footer className="bg-gray-900 py-10 text-gray-200">
+      <div className="mx-auto px-4 container">
+        <div className="flex md:flex-row flex-col justify-between items-start md:items-center">
           {/* Company Info */}
           <div className="mb-8 md:mb-0">
-            <h2 className="text-2xl font-bold text-white">JobConnect</h2>
-            <p className="text-sm mt-2 max-w-sm">
+            <h2 className="font-bold text-2xl text-white">JobConnect</h2>
+            <p className="mt-2 max-w-sm text-sm">
               Your trusted platform for connecting job seekers and employers. We provide top-notch career resources and job listings tailored for your success.
             </p>
-            <p className="text-xs mt-4">&copy; 2024 JobConnect. All Rights Reserved.</p>
+            <p className="mt-4 text-xs">&copy; 2024 JobConnect. All Rights Reserved.</p>
           </div>
 
           {/* Quick Links */}
-          <div className="flex flex-col md:flex-row md:space-x-12 mb-8 md:mb-0">
+          <div className="flex md:flex-row flex-col md:space-x-12 mb-8 md:mb-0">
             <div>
               <h3 className="font-semibold text-lg text-white">Quick Links</h3>
-              <ul className="mt-4 space-y-2">
+              <ul className="space-y-2 mt-4">
                 <li><a href="/" className="hover:text-gray-400">About Us</a></li>
                 <li><a href="/" className="hover:text-gray-400">Browse Jobs</a></li>
                 <li><a href="/" className="hover:text-gray-400">Contact Us</a></li>
@@ -27,7 +27,7 @@ const Footer = () => {
             </div>
             <div className="mt-8 md:mt-0">
               <h3 className="font-semibold text-lg text-white">Support</h3>
-              <ul className="mt-4 space-y-2">
+              <ul className="space-y-2 mt-4">
                 <li><a href="/" className="hover:text-gray-400">Help Center</a></li>
                 <li><a href="/" className="hover:text-gray-400">FAQs</a></li>
                 <li><a href="/" className="hover:text-gray-400">Privacy Policy</a></li>
@@ -38,7 +38,7 @@ const Footer = () => {
           {/* Contact Info */}
           <div className="text-white">
             <h3 className="font-semibold text-lg text-white">Contact Us</h3>
-            <ul className="mt-4 space-y-2">
+            <ul className="space-y-2 mt-4">
               <li>Email: <a href="mailto:support@jobconnect.com" className="hover:text-gray-400">support@jobconnect.com</a></li>
               <li>Phone: <a href="tel:+1234567890" className="hover:text-gray-400">+1 234 567 890</a></li>
               <li>Location: 1234 JobConnect St, Employment City, USA</li>

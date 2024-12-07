@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { toast } from "react-toastify"; // toast for notifications
@@ -63,41 +62,38 @@ const ResetPassword = () => {
         backgroundPosition: "center",
       }}
     >
-      <div className="flex flex-col flex-1">
-        <Navbar />
-        <div className="flex justify-center items-center flex-1">
-          <form
-            className="relative w-full max-w-md my-10 p-8 text-white bg-[#005477] bg-opacity-95 shadow-lg rounded-lg z-10"
-            onSubmit={submitHandler}
-          >
-            <h1 className="font-bold text-2xl mb-6 text-center">Reset Password</h1>
-            <div className="my-4">
-              <Label>Email</Label>
-              <Input
-                type="email"
-                name="email"
-                placeholder="test@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
-              />
-            </div>
+      <div className="flex flex-col justify-center items-center flex-1">
+        <form
+          className="relative w-full max-w-md my-10 p-8 text-white bg-[#005477] bg-opacity-95 shadow-lg rounded-lg z-10"
+          onSubmit={submitHandler}
+        >
+          <h1 className="font-bold text-2xl mb-6 text-center">Reset Password</h1>
+          <div className="my-4">
+            <Label>Email</Label>
+            <Input
+              type="email"
+              name="email"
+              placeholder="test@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+            />
+          </div>
 
-            {loading ? (
-              <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
-              >
-                Send Reset Email
-              </Button>
-            )}
-          </form>
-        </div>
+          {loading ? (
+            <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="w-full my-4 bg-black hover:bg-black-800 transition duration-200"
+            >
+              Send Reset Email
+            </Button>
+          )}
+        </form>
       </div>
     </div>
   );

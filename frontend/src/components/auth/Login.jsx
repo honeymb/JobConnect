@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
@@ -12,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLoading, setUser } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 import loginImage from "@/assets/login.jpg"; //Image reference from : https://www.pexels.com
+import Anime from "../shared/Anime";
+
 const Login = () => {
   const [input, setInput] = useState({
     email: "",
@@ -21,10 +22,31 @@ const Login = () => {
   const { loading, user } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const showRadios = false;
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+
+  const successHandler = (res) => {
+    if (res.data.success) {
+      const userData = res?.data?.user;
+      dispatch(setUser(userData));
+      const userRole = userData.role;
+      if (userRole === "admin") {
+        navigate("/admin/jc-users");
+      } else if (userRole === "recruiter") {
+        if (!(userData.profile && userData.profile.company)) {
+          navigate("/recruiter/companies/create");
+        } else {
+          navigate("/recruiter/jobs");
+        }
+      } else {
+        navigate("/");
+      }
+      toast.success(res.data.message);
+    }
+  }
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -39,11 +61,7 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      if (res.data.success) {
-        dispatch(setUser(res.data.user));
-        navigate("/");
-        toast.success(res.data.message);
-      }
+      successHandler(res);
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -52,15 +70,9 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
-
   return (
     <div
-      className="relative min-h-screen flex flex-col"
+      className="relative flex flex-col min-h-[94vh]"
       style={{
         backgroundImage: `url(${loginImage})`, // Use the login image as the background
         backgroundSize: "cover", // Ensures the background covers the entire container
@@ -69,14 +81,13 @@ const Login = () => {
         backgroundAttachment: "fixed", // Keeps the background fixed during scroll
       }}
     >
-      <div className="flex flex-col flex-1">
-        <Navbar />
-        <div className="flex justify-center items-center flex-1">
-          <form
-            onSubmit={submitHandler}
-            className="relative w-full max-w-md my-10 p-8 text-white bg-[#005477] bg-opacity-90 shadow-lg rounded-lg z-10"
-          >
-            <h1 className="font-bold text-2xl mb-6 text-center">Login</h1>
+      <div className="flex flex-col flex-1 justify-center items-center">
+        <form
+          onSubmit={submitHandler}
+          className="relative bg-[#005477] bg-opacity-90 shadow-lg p-8 rounded-lg w-full max-w-md text-white"
+        >
+          <Anime>
+            <h1 className="mb-6 font-bold text-2xl text-center">Login</h1>
             <div className="my-4">
               <Label>Email</Label>
               <Input
@@ -85,7 +96,7 @@ const Login = () => {
                 name="email"
                 onChange={changeEventHandler}
                 placeholder="test@gmail.com"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className="border-gray-300 p-2 border rounded-md focus:ring focus:ring-blue-500 w-full text-black transition duration-200 focus:outline-none"
               />
             </div>
 
@@ -97,10 +108,11 @@ const Login = () => {
                 name="password"
                 onChange={changeEventHandler}
                 placeholder="Password"
-                className="text-black rounded-md border border-gray-300 p-2 w-full transition duration-200 focus:outline-none focus:ring focus:ring-blue-500"
+                className="border-gray-300 p-2 border rounded-md focus:ring focus:ring-blue-500 w-full text-black transition duration-200 focus:outline-none"
               />
             </div>
-            <div className="flex items-center justify-between my-4">
+
+            {showRadios && <div className="flex justify-between items-center my-4">
               <RadioGroup className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
                   <Input
@@ -110,7 +122,7 @@ const Login = () => {
                     value="jobseeker"
                     checked={input.role === "jobseeker"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4"
+                    className="w-4 h-4 cursor-pointer"
                   />
                   <Label htmlFor="jobseeker">Job Seeker</Label>
                 </div>
@@ -122,40 +134,52 @@ const Login = () => {
                     value="recruiter"
                     checked={input.role === "recruiter"}
                     onChange={changeEventHandler}
-                    className="cursor-pointer h-4 w-4"
+                    className="w-4 h-4 cursor-pointer"
                   />
                   <Label htmlFor="recruiter">Recruiter</Label>
                 </div>
+                {/* <div className="flex items-center space-x-2">
+                <Input
+                  id="admin"
+                  type="radio"
+                  name="role"
+                  value="admin"
+                  checked={input.role === "admin"}
+                  onChange={changeEventHandler}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <Label htmlFor="admin">Admin</Label>
+              </div> */}
               </RadioGroup>
-            </div>
+            </div>}
 
             {loading ? (
-              <Button className="w-full my-4 bg-gradient-to-r from-black to-teal-500 hover:opacity-90 transition duration-500">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+              <Button className="bg-gradient-to-r from-black to-teal-500 hover:opacity-90 my-4 w-full transition duration-500">
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please wait
               </Button>
             ) : (
-              <Button type="submit" className="w-full my-4 bg-black hover:bg-black-700 transition duration-200">
+              <Button type="submit" className="bg-black hover:bg-black-700 my-4 w-full transition duration-200">
                 Login
               </Button>
             )}
 
             {/* Aligning the account and password recovery links */}
-            <div className="text-sm text-center">
+            <div className="text-center text-sm">
               <div>
                 Don't have an account?{" "}
-                <Link to="/signup" className="text-[#44c8ff] font-semibold hover:underline">
+                <Link to="/signup" className="font-semibold text-[#44c8ff] hover:underline">
                   Signup
                 </Link>
               </div>
               <div>
                 Forgot Your Password?{" "}
-                <Link to="/reset-password" className="text-[#44c8ff] font-semibold hover:underline">
+                <Link to="/reset-password" className="font-semibold text-[#44c8ff] hover:underline">
                   Reset Password
                 </Link>
               </div>
             </div>
-          </form>
-        </div>
+          </Anime>
+        </form>
       </div>
     </div>
   );
