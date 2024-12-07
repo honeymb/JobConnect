@@ -10,14 +10,16 @@ export const register = async (req, res) => {
 
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "All fields must be completed. Please fill in the missing information.",
                 success: false
             });
         };
         let cloudResponse, file = req.file;
         if (file) {
             const fileUri = getDataUri(file);
-            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                access_mode: "public",
+            });
         }
 
         const user = await User.findOne({ email });
@@ -52,19 +54,23 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password, role } = req.body;
-        if (!email || !password || !role) {
+        if (!email || !password) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "All fields must be completed. Please fill in the missing information.",
                 success: false
             });
         };
 
         let user = await User.findOne({ email });
+        console.log('>> user - - ', user);
         if (!user) {
             return res.status(400).json({
                 message: "Incorrect email or password.",
                 success: false,
             })
+        }
+        if (user && user.company) {
+            user.profile.company = user.company;
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
@@ -75,25 +81,10 @@ export const login = async (req, res) => {
             })
         };
 
-        // check if the role is correct or not
-        if (role !== user.role) {
-            return res.status(400).json({
-                message: "Account doesn't exist with current role.",
-                success: false
-            })
-        };
-
         const tokenData = { userId: user._id }
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '30d' });
 
-        user = {
-            _id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            profile: user.profile
-        }
+        delete user['password'];
 
         return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
             message: `Welcome back ${user.fullname}`,
@@ -124,7 +115,9 @@ export const updateProfile = async (req, res) => {
         // Cloudinary code
         if (file) {
             const fileUri = getDataUri(file);
-            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                access_mode: "public",
+            });
         }
 
         let skillsArray;
@@ -272,3 +265,271 @@ export const changePassword = async (req, res) => {
         });
     }
 };
+
+export const listUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        return res.status(200).json({
+            message: "Users fetched successfully.",
+            users,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while fetching users.",
+            success: false
+        });
+    }
+};
+
+export const listRecruiters = async (req, res) => {
+    try {
+        const users = await User.find({ role: 'recuiter' });
+        return res.status(200).json({
+            message: "Users fetched successfully.",
+            users,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while fetching users.",
+            success: false
+        });
+    }
+};
+
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        return res.status(200).json({
+            message: "User fetched successfully.",
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while fetching the user.",
+            success: false
+        });
+    }
+};
+
+export const editUserById = async (req, res) => {
+    try {
+        const { fullname, email, phoneNumber, role } = req.body;
+        const { id } = req.params;
+
+        let user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        // Update fields
+        if (fullname) user.fullname = fullname;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (role) user.role = role;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "User updated successfully.",
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while updating the user.",
+            success: false
+        });
+    }
+};
+
+export const updateUserApprovalStatusById = async (req, res) => {
+    try {
+        const { approvalStatus } = req.body;
+        const { id } = req.params;
+
+        let user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        // Update fields
+        if (approvalStatus) user.approvalStatus = approvalStatus;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "User updated successfully.",
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "An error occurred while updating the user.",
+            success: false
+        });
+    }
+};
+
+export const updateCompaniesViewed = async (req, res) => {
+    try {
+        const userId = req.id;
+        const { companyId } = req.body;
+
+        console.log('>> companyId ', companyId);
+
+        if (!companyId) {
+            return res.status(400).json({
+                message: "Invalid company ID.",
+                success: false,
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false,
+            });
+        }
+
+        if (!Array.isArray(user.companiesViewed)) {
+            user.companiesViewed = [];
+        }
+
+        // Avoid duplicate entries
+        if (!user.companiesViewed.includes(companyId)) {
+            user.companiesViewed.push(companyId);
+        }
+
+        console.log("Before save:", user);
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Company viewed successfully.",
+            success: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "An error occurred.",
+            success: false,
+            error: error.message,
+        });
+    }
+};
+
+export const updateJobsViewed = async (req, res) => {
+    try {
+        const userId = req.id;
+        const { jobId } = req.body;
+
+        if (!jobId) {
+            return res.status(400).json({
+                message: "Invalid job ID.",
+                success: false,
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false,
+            });
+        }
+
+        if (!Array.isArray(user.jobsViewed)) {
+            user.jobsViewed = [];
+        }
+
+        // Avoid duplicate entries
+        if (!user.jobsViewed.includes(jobId)) {
+            user.jobsViewed.push(jobId);
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Job viewed successfully.",
+            success: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "An error occurred.",
+            success: false,
+            error: error.message,
+        });
+    }
+};
+
+export const addSavedJobs = async (req, res) => {
+    try {
+        const userId = req.id;
+        const { jobId } = req.body;
+
+        if (!jobId) {
+            return res.status(400).json({
+                message: "Invalid job ID.",
+                success: false,
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false,
+            });
+        }
+
+        if (!Array.isArray(user.savedJobs)) {
+            user.savedJobs = [];
+        }
+
+        // Avoid duplicate entries
+        if (!user.savedJobs.includes(jobId)) {
+            user.savedJobs.push(jobId);
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Job saved for later successfully.",
+            success: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "An error occurred.",
+            success: false,
+            error: error.message,
+        });
+    }
+};
+
+
+
