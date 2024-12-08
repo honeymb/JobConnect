@@ -19,8 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const corsOptions = {
-    origin: 'http://localhost:5173',
-    credentials: true
+    origin: ['http://localhost:5173', 'https://jobconnect-hag.netlify.app'], // Add all allowed origins
+    credentials: true, // Allow cookies and credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow necessary headers
 }
 
 app.use(cors(corsOptions));
