@@ -9,27 +9,27 @@ import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
 dotenv.config({});
-// require('dotenv').config();
-
 const app = express();
 const API = (api) => `/api/v1/${api}`;
 
-// middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-const corsOptions = {
-    origin: ['http://localhost:5173', 'https://jobconnect-hag.netlify.app'], // Add all allowed origins
-    credentials: true, // Allow cookies and credentials
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
-    allowedHeaders: ['Content-Type', 'Authorization'] // Allow necessary headers
-}
 
+// Updated CORS Configuration
+const corsOptions = {
+    origin: 'https://jobconnect-hag.netlify.app', // Replace with frontend URL
+    credentials: true, // Allow credentials (cookies, etc.)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+};
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
 
 const PORT = process.env.PORT || 8000;
 
-// API's
+// APIs
 app.use(API('user'), userRoute);
 app.use(API('company'), companyRoute);
 app.use(API('job'), jobRoute);
@@ -38,4 +38,4 @@ app.use(API('application'), applicationRoute);
 app.listen(PORT, () => {
     connectDB();
     console.log(`Server running at port ${PORT}`);
-})
+});
