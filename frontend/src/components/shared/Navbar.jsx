@@ -14,7 +14,6 @@ import useGetUserLocation from '@/hooks/useGetUserLocation';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import Notifications from './Notifications';
 import { setCompanies } from '@/redux/companySlice';
-import axiosPrivate from '@/hooks/useAxiosPrivate';
 
 const Navbar = () => {
     const { user } = useSelector((store) => store.auth);
