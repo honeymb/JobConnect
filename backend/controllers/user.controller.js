@@ -86,15 +86,24 @@ export const login = async (req, res) => {
 
         delete user['password'];
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
+        // Set cookie with secure flag only in production
+        const cookieOptions = {
+            maxAge: 1 * 24 * 60 * 60 * 1000,  // 1 day
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production only
+            sameSite: 'strict', // Adjust as needed
+        };
+
+        return res.status(200).cookie("token", token, cookieOptions).json({
             message: `Welcome back ${user.fullname}`,
             user,
             success: true
-        })
+        });
     } catch (error) {
         console.log(error);
     }
-}
+};
+
 
 export const logout = async (req, res) => {
     try {

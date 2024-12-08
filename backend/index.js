@@ -8,7 +8,7 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 
-dotenv.config({});
+dotenv.config();
 const app = express();
 const API = (api) => `/api/v1/${api}`;
 
@@ -17,17 +17,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Updated CORS Configuration
+// CORS Configuration
 const corsOptions = {
-    origin: 'https://jobconnect-hag.netlify.app', // Replace with frontend URL
+    origin: 'https://jobconnect-hag.netlify.app', // Replace with your frontend URL
     credentials: true, // Allow credentials (cookies, etc.)
 };
+
+// Use CORS middleware
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests
+
+// Handle preflight requests
+app.options('*', cors(corsOptions)); // This is fine for handling preflight
 
 const PORT = process.env.PORT || 8000;
 
-// APIs
+// API Routes
 app.use(API('user'), userRoute);
 app.use(API('company'), companyRoute);
 app.use(API('job'), jobRoute);
