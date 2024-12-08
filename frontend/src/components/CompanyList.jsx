@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { API_PORT } from "@/utils/constant";
+import { COMPANY_API_END_POINT } from "@/utils/constant";
 
 
 const CompanyList = () => {
@@ -13,7 +13,7 @@ const CompanyList = () => {
   useEffect(() => {
     const token = Cookies.get("token"); // Get the token from the cookie
 
-    axios.get(`http://localhost:${API_PORT}/api/v1/company/get`,
+    axios.get(`${COMPANY_API_END_POINT}/get`,
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header

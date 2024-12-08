@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { API_PORT } from "@/utils/constant";
+import { COMPANY_API_END_POINT } from "@/utils/constant";
 import useGetUserLocation from "@/hooks/useGetUserLocation";
 
 const AddNewCompany = () => {
@@ -31,7 +31,7 @@ const AddNewCompany = () => {
     const token = Cookies.get("token"); // Get the token from the cookie
     try {
       await axios.post(
-        `http://localhost:${API_PORT}/api/v1/company/register`,
+        `${COMPANY_API_END_POINT}/register`,
         company,
         {
           headers: {
