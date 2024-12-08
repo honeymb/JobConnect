@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { axiosPublic } from "@/hooks/useAxiosPrivate"; from "axios";
+import { axiosPublic } from "@/hooks/useAxiosPrivate";
 import { toast } from "react-toastify"; // toast for notifications
 import { USER_API_END_POINT } from "@/utils/constant"; // your API endpoint
 import emailjs from "@emailjs/browser";
