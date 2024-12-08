@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PRODUCTION_API } from "@/utils/constant";
+import Cookies from 'js-cookie';
 
 // Utility function to get cookies by name
 const getCookie = (name) => {
@@ -23,7 +24,7 @@ const axiosPrivate = axios.create({
 axiosPrivate.interceptors.request.use(
     (config) => {
         // Get the token from cookies
-        const token = getCookie('token');
+        const token = Cookies.get('token'); // Assumes the cookie name is 'token'
         console.log('>> token', token); // Log token for debugging
 
         // If token is available, add it to Authorization header
