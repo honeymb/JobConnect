@@ -7,6 +7,11 @@ const getCookie = (name) => {
     return match ? match[2] : null;
 };
 
+// Create a public Axios instance for private requests
+export const axiosPublic = axios.create({
+    baseURL: PRODUCTION_API, // Your API base URL
+});
+
 // Create an Axios instance for private requests (with credentials)
 const axiosPrivate = axios.create({
     baseURL: PRODUCTION_API, // Your API base URL
