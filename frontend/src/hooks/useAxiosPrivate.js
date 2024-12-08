@@ -4,6 +4,7 @@ import { PRODUCTION_API } from "@/utils/constant";
 // Utility function to get cookies by name
 const getCookie = (name) => {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    console.log('>> match ', match);
     return match ? match[2] : null;
 };
 
