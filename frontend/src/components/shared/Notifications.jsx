@@ -67,8 +67,9 @@ const Notifications = () => {
                 isNotifLoaded();
             }
         } catch (error) {
+            console.error(error);
+            isNotifLoaded();
             setLoading(false);
-            console.error(error)
         }
     }
 
