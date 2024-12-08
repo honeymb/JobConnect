@@ -1,5 +1,10 @@
 import { PRODUCTION_API } from "@/utils/constant";
-import axios from "axios";
+import { axiosPublic } from "@/hooks/useAxiosPrivate";
+
+// Create an Axios instance for private requests (with credentials)
+export const axiosPublic = axios.create({
+    baseURL: PRODUCTION_API
+});
 
 // Create an Axios instance for private requests (with credentials)
 const axiosPrivate = axios.create({

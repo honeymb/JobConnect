@@ -4,7 +4,6 @@ import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +11,7 @@ import { setLoading, setUser } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 import loginImage from "@/assets/login.jpg"; //Image reference from : https://www.pexels.com
 import Anime from "../shared/Anime";
+import { axiosPublic } from "@/hooks/useAxiosPrivate";
 
 const Login = () => {
   const [input, setInput] = useState({
@@ -19,7 +19,7 @@ const Login = () => {
     password: "",
     role: "",
   });
-  const { loading, user } = useSelector((store) => store.auth);
+  const { loading } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const showRadios = false;
@@ -57,7 +57,7 @@ const Login = () => {
     }
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/login`, inputData, {
+      const res = await axiosPublic.post(`${USER_API_END_POINT}/login`, inputData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

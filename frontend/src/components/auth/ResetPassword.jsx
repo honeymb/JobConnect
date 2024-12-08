@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import axios from "axios";
+import { axiosPublic } from "@/hooks/useAxiosPrivate"; from "axios";
 import { toast } from "react-toastify"; // toast for notifications
 import { USER_API_END_POINT } from "@/utils/constant"; // your API endpoint
 import emailjs from "@emailjs/browser";
@@ -17,7 +17,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post(`${USER_API_END_POINT}/reset-password`, {
+      const res = await axiosPublic.post(`${USER_API_END_POINT}/reset-password`, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
         email,
