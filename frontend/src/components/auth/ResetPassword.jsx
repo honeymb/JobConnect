@@ -47,7 +47,7 @@ const ResetPassword = () => {
         to_name: userName,
         from_email: 'honeymb916@gmail.com',
         to_email: email,
-        message: `http://localhost:5173/change-password/${token}`,
+        message: `${import.meta.env.VITE_PROD_API}/change-password/${token}`,
       },
       import.meta.env.VITE_API_EMAILJS_PUBLIC_KEY
     );
