@@ -4,6 +4,7 @@ export const USER_API_END_POINT = `user`;
 export const JOB_API_END_POINT = `job`;
 export const APPLICATION_API_END_POINT = `application`;
 export const COMPANY_API_END_POINT = `company`;
+export const FE_URL = `https://jobconnect-hag.netlify.app`;
 
 export const USER_ROLE = {
     jobseeker: 'Job Seeker',

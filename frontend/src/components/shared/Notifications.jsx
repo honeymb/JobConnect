@@ -24,9 +24,7 @@ const Notifications = () => {
         let notifDataList = [];
         const isNotifLoaded = () => {
             setHasNotifications(false);
-            if (notifDataList.length) {
-                setHasNotifications(true);
-            }
+            if (notifDataList.length) { setHasNotifications(true); }
             setNotificationList(notifDataList);
             setLoading(false);
         }
@@ -50,7 +48,7 @@ const Notifications = () => {
                         return true;
                     }
                     return false;
-                })
+                });
                 isNotifLoaded();
             } else if (user?.role === 'jobseeker') {
                 setLoading(true);

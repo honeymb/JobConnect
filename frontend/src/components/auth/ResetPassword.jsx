@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { axiosPublic } from "@/hooks/useAxiosPrivate";
 import { toast } from "react-toastify"; // toast for notifications
-import { USER_API_END_POINT } from "@/utils/constant"; // your API endpoint
+import { FE_URL, USER_API_END_POINT } from "@/utils/constant"; // your API endpoint
 import emailjs from "@emailjs/browser";
 import resetImage from "@/assets/resetpwd.jpeg"; // reuse the signup background image
 import { Loader2 } from "lucide-react"; // loader icon for loading state
@@ -47,7 +47,7 @@ const ResetPassword = () => {
         to_name: userName,
         from_email: 'honeymb916@gmail.com',
         to_email: email,
-        message: `${import.meta.env.VITE_PROD_API}/change-password/${token}`,
+        message: `${FE_URL}/change-password/${token}`,
       },
       import.meta.env.VITE_API_EMAILJS_PUBLIC_KEY
     );
