@@ -1,10 +1,11 @@
+import axios from 'axios';
 import { PRODUCTION_API } from "@/utils/constant";
-import axios from "axios";
 
-// Create an Axios instance for private requests (with credentials)
-export const axiosPublic = axios.create({
-    baseURL: PRODUCTION_API
-});
+// Utility function to get cookies by name
+const getCookie = (name) => {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+};
 
 // Create an Axios instance for private requests (with credentials)
 const axiosPrivate = axios.create({
@@ -15,37 +16,34 @@ const axiosPrivate = axios.create({
 // Request Interceptor
 axiosPrivate.interceptors.request.use(
     (config) => {
-        // Optionally, you can get the token from cookies here and add it to headers
-        const token = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token='));
+        // Get the token from cookies
+        const token = getCookie('token');
+        console.log('>> token', token); // Log token for debugging
 
+        // If token is available, add it to Authorization header
         if (token) {
-            config.headers['Authorization'] = `Bearer ${token.split('=')[1]}`;
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
 
         return config;
     },
     (error) => {
-        // Handle request error
         return Promise.reject(error);
     }
 );
 
-// Response Interceptor
+// Response Interceptor (Handles 401 Unauthorized)
 axiosPrivate.interceptors.response.use(
     (response) => {
-        // If everything is fine, return the response
         return response;
     },
     async (error) => {
-        // Check for 401 (unauthorized) to handle token expiration
+        // Check for 401 (Unauthorized) status
         if (error.response && error.response.status === 401) {
-            // Handle unauthorized (token expired or invalid)
-            // You could redirect to login page or refresh the token here
-            // Example:
+            console.log('Token expired or invalid');
+            // You could redirect to login page or refresh token logic here
             // window.location.href = "/login"; 
-            // Or if you have a refresh token mechanism, you can implement it here
-
-            // Optional: Refresh token logic could be added here
+            // Or implement refresh token logic if necessary
 
             return Promise.reject(error);
         }
