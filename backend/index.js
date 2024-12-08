@@ -21,8 +21,6 @@ app.use(cookieParser());
 const corsOptions = {
     origin: 'https://jobconnect-hag.netlify.app', // Replace with frontend URL
     credentials: true, // Allow credentials (cookies, etc.)
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 };
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Handle preflight requests
