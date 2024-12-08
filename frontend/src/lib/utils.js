@@ -2,8 +2,8 @@ import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import UserAvatar from '../assets/user-avatar.png';
 import LogoAvatar from '../assets/jobconnect.png';
-import axios from "axios";
 import { JOB_API_END_POINT, USER_API_END_POINT } from "@/utils/constant";
+import axiosPrivate from "@/hooks/useAxiosPrivate";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -20,7 +20,7 @@ export const truncateDesc = (desc = '', limit = 150) => {
 }
 
 export const updateCompaniesViewedByUser = async (data) => {
-  const res = await axios.put(`${USER_API_END_POINT}/users/company-viewed`, { companyId: data.companyId }, {
+  const res = await axiosPrivate.put(`${USER_API_END_POINT}/users/company-viewed`, { companyId: data.companyId }, {
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
   });
@@ -28,21 +28,21 @@ export const updateCompaniesViewedByUser = async (data) => {
 }
 
 export const getUserById = async (userId) => {
-  const res = await axios.get(`${USER_API_END_POINT}/users/${userId}`, {
+  const res = await axiosPrivate.get(`${USER_API_END_POINT}/users/${userId}`, {
     withCredentials: true
   });
   return res?.data?.user;
 }
 
 export const getAllJobsPostedToday = async (userId) => {
-  const res = await axios.get(`${JOB_API_END_POINT}/get/jobs-posted-today`, {
+  const res = await axiosPrivate.get(`${JOB_API_END_POINT}/get/jobs-posted-today`, {
     withCredentials: true
   });
   return res?.data?.jobs;
 }
 
 export const updateJobsViewedByUser = async (data) => {
-  const res = await axios.put(`${USER_API_END_POINT}/users/jobs-viewed`, { jobId: data.jobId }, {
+  const res = await axiosPrivate.put(`${USER_API_END_POINT}/users/jobs-viewed`, { jobId: data.jobId }, {
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
   });
@@ -50,7 +50,7 @@ export const updateJobsViewedByUser = async (data) => {
 }
 
 export const savedJobByUser = async (data) => {
-  const res = await axios.put(`${USER_API_END_POINT}/users/jobs-saved`, { jobId: data.jobId }, {
+  const res = await axiosPrivate.put(`${USER_API_END_POINT}/users/jobs-saved`, { jobId: data.jobId }, {
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
   });

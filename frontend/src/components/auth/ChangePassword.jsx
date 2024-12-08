@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 import { toast } from "react-toastify";
 import { toast as sonnerToast } from 'sonner';
 import { useParams, useNavigate } from "react-router-dom";
@@ -36,7 +36,7 @@ const ChangePassword = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post(`${USER_API_END_POINT}/change-password`, {
+      const res = await axiosPrivate.post(`${USER_API_END_POINT}/change-password`, {
         password,
         token,
       });

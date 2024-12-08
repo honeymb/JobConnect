@@ -4,7 +4,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import axios from 'axios'
+import axiosPrivate from '@/hooks/useAxiosPrivate'
 import { JOB_API_END_POINT } from '@/utils/constant'
 import { toast } from 'sonner'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -55,12 +55,12 @@ const PostJob = () => {
             setInput(inputData);
             let res = null;
             if (params && params.id) {
-                res = await axios.put(`${JOB_API_END_POINT}/update/${params.id}`, inputData, {
+                res = await axiosPrivate.put(`${JOB_API_END_POINT}/update/${params.id}`, inputData, {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
             } else {
-                res = await axios.post(`${JOB_API_END_POINT}/post`, inputData, {
+                res = await axiosPrivate.post(`${JOB_API_END_POINT}/post`, inputData, {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 
 const CompanyDetails = () => {
   const [company, setCompany] = useState({
@@ -11,7 +11,7 @@ const CompanyDetails = () => {
 
   useEffect(() => {
     // Fetch company details
-    axios.get("/api/v1/company/get").then((response) => {
+    axiosPrivate.get("/api/v1/company/get").then((response) => {
       setCompany(response.data);
     });
   }, []);
@@ -25,7 +25,7 @@ const CompanyDetails = () => {
   };
 
   const handleSave = () => {
-    axios.put("/api/admin/company", company).then((response) => {
+    axiosPrivate.put("/api/admin/company", company).then((response) => {
       alert("Company details updated!");
     });
   };

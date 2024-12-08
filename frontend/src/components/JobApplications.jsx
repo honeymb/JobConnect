@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 
 const JobApplications = () => {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
     // Fetch all job applications
-    axios.get("/api/admin/applications").then((response) => {
+    axiosPrivate.get("/api/admin/applications").then((response) => {
       setApplications(response.data);
     });
   }, []);

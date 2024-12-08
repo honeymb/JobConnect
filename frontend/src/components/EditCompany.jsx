@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 import Cookies from "js-cookie";
 import { COMPANY_API_END_POINT } from "@/utils/constant";
 import useGetUserLocation from "@/hooks/useGetUserLocation";
@@ -19,7 +19,7 @@ const EditCompany = () => {
   useEffect(() => {
     // Fetch company details
     const token = Cookies.get("token"); // Get the token from the cookie
-    axios.get(`${COMPANY_API_END_POINT}/get/${id}`,
+    axiosPrivate.get(`${COMPANY_API_END_POINT}/get/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -39,7 +39,7 @@ const EditCompany = () => {
 
   const handleSave = () => {
     const token = Cookies.get("token"); // Get the token from the cookie
-    axios.put(`${COMPANY_API_END_POINT}/update/${id}`, company, {
+    axiosPrivate.put(`${COMPANY_API_END_POINT}/update/${id}`, company, {
       headers: {
         Authorization: `Bearer ${token}`, // Include the token in the Authorization header
       },

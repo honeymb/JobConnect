@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 import Cookies from "js-cookie";
 import { COMPANY_API_END_POINT } from "@/utils/constant";
 import useGetUserLocation from "@/hooks/useGetUserLocation";
@@ -30,7 +30,7 @@ const AddNewCompany = () => {
 
     const token = Cookies.get("token"); // Get the token from the cookie
     try {
-      await axios.post(
+      await axiosPrivate.post(
         `${COMPANY_API_END_POINT}/register`,
         company,
         {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 import Cookies from "js-cookie";
 import { USER_API_END_POINT } from "@/utils/constant";
 
@@ -20,7 +20,7 @@ const EditUser = () => {
     const fetchUser = async () => {
       try {
         const token = Cookies.get("token"); // Get the token from the cookie
-        const { data } = await axios.get(`${USER_API_END_POINT}/users/${id}`, {
+        const { data } = await axiosPrivate.get(`${USER_API_END_POINT}/users/${id}`, {
           headers: { Authorization: `Bearer ${token}`, } // Include the token in the Authorization header
         });
         if (data.success) {
@@ -47,7 +47,7 @@ const EditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${USER_API_END_POINT}/users/${id}/edit`, user);
+      await axiosPrivate.put(`${USER_API_END_POINT}/users/${id}/edit`, user);
       navigate("/admin/users"); // Redirect to user listing page after successful edit
     } catch (error) {
       console.log("Error updating user:", error);

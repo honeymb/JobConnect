@@ -1,11 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import axios from 'axios';
 import { USER_API_END_POINT, USER_ROLE } from '@/utils/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUsers } from '@/redux/applicationSlice';
 import UsersTable from './UsersTable';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { toast } from 'sonner';
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 
 const JCUsers = () => {
     const dispatch = useDispatch();
@@ -16,7 +16,7 @@ const JCUsers = () => {
     useEffect(() => {
         const fetchAllApplicants = async () => {
             try {
-                const res = await axios.get(`${USER_API_END_POINT}/users`, { withCredentials: true });
+                const res = await axiosPrivate.get(`${USER_API_END_POINT}/users`, { withCredentials: true });
                 dispatch(setUsers(res.data.users));
             } catch (error) {
                 toast.error(error.response.data.message);

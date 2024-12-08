@@ -5,7 +5,7 @@ import { Avatar, AvatarImage } from '../ui/avatar';
 import { LogOut, User2 } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 import { USER_API_END_POINT } from '@/utils/constant';
 import { setUser } from '@/redux/authSlice';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import useGetUserLocation from '@/hooks/useGetUserLocation';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import Notifications from './Notifications';
 import { setCompanies } from '@/redux/companySlice';
+import axiosPrivate from '@/hooks/useAxiosPrivate';
 
 const Navbar = () => {
     const { user } = useSelector((store) => store.auth);
@@ -29,7 +30,7 @@ const Navbar = () => {
 
     const logoutHandler = async () => {
         try {
-            const res = await axios.get(`${USER_API_END_POINT}/logout`, {
+            const res = await axiosPrivate.get(`${USER_API_END_POINT}/logout`, {
                 withCredentials: true,
             });
             if (res.data.success) {

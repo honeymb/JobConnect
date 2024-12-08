@@ -1,12 +1,12 @@
 import { setCompanies } from '@/redux/companySlice'
 import { COMPANY_API_END_POINT } from '@/utils/constant'
-import axios from 'axios'
+import axiosPrivate from '@/hooks/useAxiosPrivate'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 export const fetchCompanies = async (dispatch) => {
     try {
-        const res = await axios.get(`${COMPANY_API_END_POINT}/get`, { withCredentials: true });
+        const res = await axiosPrivate.get(`${COMPANY_API_END_POINT}/get`, { withCredentials: true });
         console.log('called');
         if (dispatch && res.data.companies) {
             dispatch(setCompanies(res.data.companies));

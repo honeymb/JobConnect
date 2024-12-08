@@ -6,7 +6,7 @@ import { CheckCircle2, CircleArrowLeft, Delete, Edit2, MoreHorizontal } from 'lu
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import useGetUserLocation from '@/hooks/useGetUserLocation'
-import axios from 'axios'
+import axiosPrivate from '@/hooks/useAxiosPrivate'
 import { COMPANY_API_END_POINT, USER_API_END_POINT, USER_ROLE } from '@/utils/constant'
 import { toast } from 'sonner'
 import { setCompanies } from '@/redux/companySlice'
@@ -55,7 +55,7 @@ const CompaniesTable = ({ selectedStatus }) => {
     // A function to fetch all companies
     const fetchCompanies = async () => {
         try {
-            const res = await axios.get(`${COMPANY_API_END_POINT}/get`, { withCredentials: true });
+            const res = await axiosPrivate.get(`${COMPANY_API_END_POINT}/get`, { withCredentials: true });
             if (res.data.success) {
                 dispatch(setCompanies(res.data.companies));
                 if (user?.role === 'recruiter') {
@@ -70,7 +70,7 @@ const CompaniesTable = ({ selectedStatus }) => {
     const deleteCompany = async (companyId) => {
         if (window.confirm("Are you sure you want to delete this company?")) {
             try {
-                await axios.delete(`${COMPANY_API_END_POINT}/delete/${companyId}`, { withCredentials: true });
+                await axiosPrivate.delete(`${COMPANY_API_END_POINT}/delete/${companyId}`, { withCredentials: true });
                 toast.success("Your company has been deleted succesfully!");
             } catch (error) {
                 toast.error("Error in deleting!");
@@ -83,7 +83,7 @@ const CompaniesTable = ({ selectedStatus }) => {
     const approvalAction = async (userData = null, approvalStatus = 'approved') => {
         if (userData) {
             try {
-                await axios.put(`${USER_API_END_POINT}/approval/${userData._id}`, {
+                await axiosPrivate.put(`${USER_API_END_POINT}/approval/${userData._id}`, {
                     approvalStatus
                 }, { withCredentials: true });
                 if (approvalStatus === 'approved') {
