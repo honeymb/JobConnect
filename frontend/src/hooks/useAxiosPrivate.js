@@ -1,13 +1,7 @@
 import axios from 'axios';
 import { PRODUCTION_API } from "@/utils/constant";
 import Cookies from 'js-cookie';
-
-// Utility function to get cookies by name
-const getCookie = (name) => {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    console.log('>> match ', match);
-    return match ? match[2] : null;
-};
+import { getStorageItem } from './useLocalStorage';
 
 // Create a public Axios instance for private requests
 export const axiosPublic = axios.create({
@@ -24,8 +18,7 @@ const axiosPrivate = axios.create({
 axiosPrivate.interceptors.request.use(
     (config) => {
         // Get the token from cookies
-        const token = Cookies.get('token'); // Assumes the cookie name is 'token'
-        console.log('>> token', token); // Log token for debugging
+        const token = Cookies.get('token') || getStorageItem('token'); // Assumes the cookie name is 'token'
 
         // If token is available, add it to Authorization header
         if (token) {
@@ -51,7 +44,6 @@ axiosPrivate.interceptors.response.use(
             // You could redirect to login page or refresh token logic here
             // window.location.href = "/login"; 
             // Or implement refresh token logic if necessary
-
             return Promise.reject(error);
         }
 

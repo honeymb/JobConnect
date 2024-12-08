@@ -14,6 +14,7 @@ import useGetUserLocation from '@/hooks/useGetUserLocation';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import Notifications from './Notifications';
 import { setCompanies } from '@/redux/companySlice';
+import { removeAllStorage } from '@/hooks/useLocalStorage';
 
 const Navbar = () => {
     const { user } = useSelector((store) => store.auth);
@@ -32,6 +33,7 @@ const Navbar = () => {
             const res = await axiosPrivate.get(`${USER_API_END_POINT}/logout`, {
                 withCredentials: true,
             });
+            removeAllStorage();
             if (res.data.success) {
                 dispatch(setUser(null));
                 navigate('/');

@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import loginImage from "@/assets/login.jpg"; //Image reference from : https://www.pexels.com
 import Anime from "../shared/Anime";
 import { axiosPublic } from "@/hooks/useAxiosPrivate";
+import { setStorageItem } from "@/hooks/useLocalStorage";
 
 const Login = () => {
   const [input, setInput] = useState({
@@ -31,6 +32,8 @@ const Login = () => {
   const successHandler = (res) => {
     if (res.data.success) {
       const userData = res?.data?.user;
+      const token = res?.data?.token;
+      setStorageItem({token});
       dispatch(setUser(userData));
       const userRole = userData.role;
       if (userRole === "admin") {

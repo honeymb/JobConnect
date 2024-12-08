@@ -97,6 +97,7 @@ export const login = async (req, res) => {
         return res.status(200).cookie("token", token, cookieOptions).json({
             message: `Welcome back ${user.fullname}`,
             user,
+            token,
             success: true
         });
     } catch (error) {
