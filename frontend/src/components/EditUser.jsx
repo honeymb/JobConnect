@@ -47,7 +47,7 @@ const EditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:${API_PORT}/api/v1/user/users/${id}/edit`, user);
+      await axios.put(`${USER_API_END_POINT}/users/${id}/edit`, user);
       navigate("/admin/users"); // Redirect to user listing page after successful edit
     } catch (error) {
       console.log("Error updating user:", error);

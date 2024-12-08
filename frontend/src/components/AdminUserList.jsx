@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { API_PORT } from "@/utils/constant";
+import { USER_API_END_POINT } from "@/utils/constant";
 
 const AdminUserList = () => {
   const [users, setUsers] = useState([]);
@@ -11,7 +11,7 @@ const AdminUserList = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:${API_PORT}/api/v1/user/users`);
+        const { data } = await axios.get(`${USER_API_END_POINT}/users`);
         if (data.success) {
           setUsers(data.users);
         }
